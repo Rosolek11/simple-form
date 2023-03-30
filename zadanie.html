@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Formularz</title>
+  </head>
+  <body>
+    <form id="form" method="POST">
+      <label for="first_name">Imię:</label>
+      <input type="text" id="first_name" name="first_name" maxlength="20" required>
+
+      <label for="last_name">Nazwisko:</label>
+      <input type="text" id="last_name" name="last_name" maxlength="30" required>
+
+      <label for="pesel">PESEL:</label>
+      <input type="text" id="pesel" name="pesel" pattern="[0-9]{11}" required>
+
+      <label for="birthdate">Data urodzenia:</label>
+      <input type="text" id="birthdate" name="birthdate" readonly>
+
+      <button type="submit" id="submit">Wyślij</button>
+    </form>
+
+    <div id="modal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <p id="modal-text"></p>
+      </div>
+    </div>
+
+    <script>
+      function calculateBirthdateFromPesel(pesel) {
+        var year = parseInt(pesel.substring(0, 2));
+        var month = parseInt(pesel.substring(2, 4)) - 1;
+        var day = parseInt(pesel.substring(4, 6));
+
+        if (month > 80) {
+          year += 1800;
+          month -= 80;
+        } else if (month > 60) {
+          year += 2200;
+          month -= 60;
+        } else if (month > 40) {
+          year += 2100;
+          month -= 40;
+        } else if (month > 20) {
+          year += 2000;
+          month -= 20;
+        } else {
+          year += 1900;
+        }
+
+        return new Date(year, month, day).toLocaleDateString();
+      }
+
+      var form = document.getElementById('form');
+      var modal = document.getElementById('modal');
+      var modalText = document.getElementById('modal-text');
+      var peselInput = document.getElementById('pesel');
+      var birthdateInput = document.getElementById('birthdate');
+
+      form.addEventListener('submit', function(event) {
+        event.preventDefault();
+        if (form.checkValidity()) {
+          modalText.innerText = 'Formularz został wysłany.';
+          modal.style.display = 'block';
+          form.reset();
+        } else {
+          modalText.innerText = 'Formularz zawiera błędy.';
+          modal.style.display = 'block';
+        }
+      });
+
+      peselInput.addEventListener('input', function(event) {
+        birthdateInput.value = calculateBirthdateFromPesel(event.target.value);
+      });
+
+      var closeButton = document.getElementsByClassName('close')[0];
+      closeButton.addEventListener('click', function() {
+        modal.style.display = 'none';
+      });
+
+      window.addEventListener('click', function(event) {
+        if (event.target == modal) {
+          modal.style.display = 'none';
+        }
+      });
+    </script>
+  </body>
+</html>
